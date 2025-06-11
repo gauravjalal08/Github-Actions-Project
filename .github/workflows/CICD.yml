@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Trivy Fs scan
+      - name: Install Trivy
         run: |
           sudo apt-get update
           sudo apt-get install -y wget apt-transport-https gnupg lsb-release
@@ -41,14 +41,16 @@ jobs:
           echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install -y trivy
-          
-           - name: trivy fs .
-           run: trivy fs --format table -o fs-report.json .
 
-           - name: Gitleaks Installations
-           run : subo apt install gitleaks -y
-           - name: Gitleaks Code Scan
-           run: gitleaks detect source . -r gitleaks-reports.json  -f json 
+      - name: Run Trivy File System Scan
+        run: trivy fs --format table -o fs-report.json .
+
+      - name: Install Gitleaks
+        run: sudo apt-get install -y gitleaks
+
+      - name: Run Gitleaks Scan
+        run: gitleaks detect --source . --report-path gitleaks-reports.json --format json
+
 
 
 
